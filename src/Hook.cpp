@@ -50,13 +50,9 @@ namespace DualRingEquipping
 
 		auto currentRing = a_actor->GetInventoryChanges()->GetArmorInSlot(RE::InventoryChanges::ArmorSlot::kRing);
 		if (currentRing) {
-			for (auto& pair : a_actor->GetInventory()) {
-				if (pair.first && pair.first->As<RE::TESObjectARMO>() && pair.first->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing) && pair.second.second->IsWorn()) {
-					auto addon = pair.first->As<RE::TESObjectARMO>()->GetArmorAddonInSlot(RE::BipedObjectSlot::kRing);
-					if (addon)
-						addon->InitWornArmorAddon(currentRing, a_biped, a_sex);
-				}
-			}
+			auto addon = currentRing->GetArmorAddonInSlot(RE::BipedObjectSlot::kRing);
+			if (addon)
+				addon->InitWornArmorAddon(currentRing, a_biped, a_sex);
 		}
 	}
 
