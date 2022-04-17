@@ -7,14 +7,14 @@ namespace DualRingEquipping
 	public:
 		static void InstallHook()
 		{
-			SKSE::AllocTrampoline(1 << 4);
-			auto& trampoline = SKSE::GetTrampoline();
-
 #if ANNIVERSARY_EDITION
 
 #else
 			std::uint32_t base = 24232, offset = 0x302;
 #endif
+			SKSE::AllocTrampoline(1 << 4);
+			auto& trampoline = SKSE::GetTrampoline();
+
 			REL::Relocation<std::uintptr_t> InitWornArmorAddonBase{ REL::ID(base) };
 			_InitWornArmor = trampoline.write_call<5>(InitWornArmorAddonBase.address() + offset, InitWornArmor);
 			logger::debug("Hook InitWornArmor!, Base:{}, Offset:{}", base, offset);
@@ -35,14 +35,14 @@ namespace DualRingEquipping
 	public:
 		static void InstallHook()
 		{
-			SKSE::AllocTrampoline(1 << 4);
-			auto& trampoline = SKSE::GetTrampoline();
-
 #if ANNIVERSARY_EDITION
 
 #else
 			std::uint32_t base = 36979, offset = 0x1ce;
 #endif
+			SKSE::AllocTrampoline(1 << 4);
+			auto& trampoline = SKSE::GetTrampoline();
+
 			REL::Relocation<std::uintptr_t> UnequipWornArmorBase{ REL::ID(base) };
 			_UnequipWornArmor = trampoline.write_call<5>(UnequipWornArmorBase.address() + offset, UnequipWornArmor);
 			logger::debug("Hook UnequipWornArmor(!, Base:{}, Offset:{}", base, offset);
