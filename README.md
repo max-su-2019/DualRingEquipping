@@ -1,0 +1,2 @@
+# DualRingEquipping
+ A SKSE Plugin
