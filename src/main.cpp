@@ -1,4 +1,4 @@
-#include "Hook.h"
+#include "Settings.h"
 
 #if ANNIVERSARY_EDITION
 
@@ -64,8 +64,11 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 
 	SKSE::Init(a_skse);
 
-	DualRingEquipping::InitWornArmorHook::InstallHook();
-	DualRingEquipping::UnequipWornArmorHook::InstallHook();
+	auto data = DualRingEquipping::INIData::GetSingleton();
+	if (data)
+		logger::info("Left Ring Slot is {:x}", data->GetLeftRingSlot());
+	else
+		return false;
 
 	return true;
 }

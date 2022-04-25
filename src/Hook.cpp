@@ -1,16 +1,17 @@
 #include "Hook.h"
+#include "Settings.h"
 
 namespace DualRingEquipping
 {
-	static std::int32_t GetWornRingCount(RE::Actor* a_actor)
+	static std::int32_t GetWornRingsCount(RE::Actor* a_actor)
 	{
 		std::int32_t count = 0;
 
 		if (!a_actor)
 			return count;
 
-		for (auto& pair : a_actor->GetInventory()) {
-			if (pair.first && pair.first->As<RE::TESObjectARMO>() && pair.first->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing) && pair.second.second->IsWorn())
+		for (auto& pair : a_actor->GetInventory([](RE::TESBoundObject& a_obj) -> bool { return (&a_obj)->As<RE::TESObjectARMO>() && (&a_obj)->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing); })) {
+			if (pair.second.second && pair.second.second->IsWorn())
 				count += 1;
 		}
 
@@ -23,8 +24,8 @@ namespace DualRingEquipping
 
 		if (a_biped && a_armor && a_armor->GetSlotMask().any(RE::BipedObjectSlot::kRing)) {
 			auto actor = a_biped->get()->actorRef.get() ? a_biped->get()->actorRef.get()->As<RE::Actor>() : nullptr;
-			auto wornRingCount = GetWornRingCount(actor);
-			switch (wornRingCount) {
+
+			switch (GetWornRingsCount(actor)) {
 			case 1:
 				InitSingleRingAddon(a_biped, actor, a_sex);
 				break;
@@ -63,9 +64,9 @@ namespace DualRingEquipping
 
 		auto currentRing = a_actor->GetInventoryChanges()->GetArmorInSlot(RE::InventoryChanges::ArmorSlot::kRing);
 		if (currentRing) {
-			for (auto& pair : a_actor->GetInventory()) {
-				if (pair.first && pair.first->As<RE::TESObjectARMO>() && pair.first->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing) && pair.second.second->IsWorn()) {
-					RE::BipedObjectSlot slot = pair.second.second->IsWornLeft() ? RE::BipedObjectSlot::kRing : RE::BipedObjectSlot::kFX01;
+			for (auto& pair : a_actor->GetInventory([](RE::TESBoundObject& a_obj) -> bool { return (&a_obj)->As<RE::TESObjectARMO>() && (&a_obj)->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing); })) {
+				if (pair.second.second && pair.second.second->IsWorn()) {
+					RE::BipedObjectSlot slot = pair.second.second->IsWornLeft() ? RE::BipedObjectSlot::kRing : INIData::GetSingleton()->GetLeftRingSlot();
 					auto addon = pair.first->As<RE::TESObjectARMO>()->GetArmorAddonInSlot(slot);
 					if (addon) {
 						addon->InitWornArmorAddon(currentRing, a_biped, a_sex);
@@ -86,7 +87,7 @@ namespace DualRingEquipping
 		logger::debug("Object Name is {}, ID is {:x}", a_object->GetName(), a_object->GetFormID());
 
 		if (a_object->IsArmor() && a_object->As<RE::TESObjectARMO>() && a_object->As<RE::TESObjectARMO>()->GetSlotMask().any(RE::BipedObjectSlot::kRing)) {
-			auto wornRingCount = GetWornRingCount(a_actor);
+			auto wornRingCount = GetWornRingsCount(a_actor);
 			logger::debug("Current Equipped Ring Count is {}", wornRingCount);
 			if (wornRingCount == 1 && a_extraData && !a_extraData->GetByType(RE::ExtraDataType::kWornLeft)) {
 				a_extraData->RemoveByType(RE::ExtraDataType::kWorn);
